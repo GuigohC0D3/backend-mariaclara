@@ -1,5 +1,5 @@
 // Carrega variáveis de ambiente
-require('dotenv').config();
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -9,9 +9,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // CORS: Libera só o domínio do Vercel
-app.use(cors({
-  origin: "https://mariaclaraabreulopes.vercel.app"
-}));
+app.use(
+  cors({
+    origin: "https://mariaclaraabreulopes.vercel.app",
+  })
+);
 
 app.use(express.json());
 
@@ -23,8 +25,8 @@ const pool = new Pool({
   password: process.env.PGPASSWORD,
   port: Number(process.env.PGPORT),
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 // GET - lista avaliações paginadas
