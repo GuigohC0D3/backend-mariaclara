@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 // CORS: Libera só o domínio do Vercel
 app.use(
   cors({
-    origin: process.env.ALLOWED_HOSTS,
+    origin: "*",
   })
 );
 
