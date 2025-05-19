@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 // CORS: Libera só o domínio do Vercel
 app.use(
   cors({
-    origin: "https://mariaclaraabreulopes.vercel.app",
+    origin: process.env.ALLOWED_HOSTS,
   })
 );
 
@@ -25,6 +25,7 @@ const pool = new Pool({
   password: process.env.PGPASSWORD,
   port: Number(process.env.PGPORT),
   ssl: {
+    require: true,
     rejectUnauthorized: false,
   },
 });
@@ -37,9 +38,10 @@ app.get("/avaliacoes", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM avaliacoes ORDER BY data DESC LIMIT $1 OFFSET $2",
+      "SELECT id, nome, mensagem, data FROM avaliacoes ORDER BY data DESC LIMIT $1 OFFSET $2",
       [limit, offset]
     );
+
     res.json(result.rows);
   } catch (err) {
     console.error("Erro ao buscar avaliações:", err);
@@ -62,7 +64,7 @@ app.post("/avaliacoes", async (req, res) => {
     );
     res.status(201).send("Avaliação salva com sucesso!");
   } catch (err) {
-    console.error("Erro ao salvar avaliação:", err);
+    console.error("Erro ao salvar avaliação:", err.message, err.stack);
     res.status(500).send("Erro ao salvar avaliação.");
   }
 });
