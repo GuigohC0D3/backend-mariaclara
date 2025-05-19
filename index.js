@@ -9,11 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // CORS: Libera só o domínio do Vercel
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
