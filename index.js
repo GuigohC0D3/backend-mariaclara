@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const client = require("pg/lib/native/client.js");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -36,8 +37,10 @@ app.get("/avaliacoes", async (req, res) => {
   const limit = parseInt(req.query.limit) || 3;
   const offset = (page - 1) * limit;
 
+  const client = await pool.connect();
+
   try {
-    const result = await pool.query(
+    const result = await client.query(
       "SELECT id, nome, mensagem, data FROM avaliacoes ORDER BY data DESC LIMIT $1 OFFSET $2",
       [limit, offset]
     );
@@ -46,6 +49,8 @@ app.get("/avaliacoes", async (req, res) => {
   } catch (err) {
     console.error("Erro ao buscar avaliações:", err);
     res.status(500).send("Erro ao buscar avaliações.");
+  } finally {
+    client.release();
   }
 });
 
@@ -57,15 +62,19 @@ app.post("/avaliacoes", async (req, res) => {
     return res.status(400).send("Campos obrigatórios.");
   }
 
+  const client = await pool.connect();
+
   try {
-    await pool.query(
+    await client.query(
       "INSERT INTO avaliacoes (nome, mensagem) VALUES ($1, $2)",
       [nome, mensagem]
     );
     res.status(201).send("Avaliação salva com sucesso!");
   } catch (err) {
-    console.error("Erro ao salvar avaliação:", err.message, err.stack);
+    console.error("Erro ao salvar avaliação:", err);
     res.status(500).send("Erro ao salvar avaliação.");
+  } finally {
+    client.release();
   }
 });
 
